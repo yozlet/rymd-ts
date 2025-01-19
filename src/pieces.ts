@@ -1,7 +1,47 @@
 // TODO: make this a class
 
-const pieceStructures = [
-    [
+
+
+enum ShapeName {
+    i,
+    o,
+    j,
+    l,
+    t,
+    s,
+    z
+}
+enum Rotation {
+    zero,
+    one,
+    two,
+    three
+}
+
+class Piece {
+    public shapeName: ShapeName;
+    public rotation: Rotation;
+
+    constructor(shapeName: ShapeName, rotation: Rotation) {
+        this.shapeName = shapeName;
+        this.rotation = rotation;
+    }
+
+    public rotateRight(): void {
+        this.rotation = <Rotation>(this.rotation + 1) % pieceStructures[this.shapeName].length;
+    }
+
+    public rotateLeft(): void {
+        this.rotation = (this.rotation - 1) % pieceStructures[this.shapeName].length;
+    }
+
+    public getShape(): Array<Array<string>> {
+        return pieceStructures[this.shapeName][this.rotation];
+    }
+}
+
+const pieceStructures: { [key in ShapeName]: Array<Array<Array<string>>> } = {
+    [ShapeName.i]: [
         [
             [' ', ' ', ' ', ' '],
             ['i', 'i', 'i', 'i'],
@@ -15,7 +55,7 @@ const pieceStructures = [
             [' ', 'i', ' ', ' '],
         ],
     ],
-    [
+    [ShapeName.o]: [
         [
             [' ', ' ', ' ', ' '],
             [' ', 'o', 'o', ' '],
@@ -23,7 +63,7 @@ const pieceStructures = [
             [' ', ' ', ' ', ' '],
         ]
     ],
-    [
+    [ShapeName.j]: [
         [
             [' ', ' ', ' ', ' '],
             ['j', 'j', 'j', ' '],
@@ -49,7 +89,7 @@ const pieceStructures = [
             [' ', ' ', ' ', ' '],
         ]
     ],
-    [
+    [ShapeName.l]: [
         [
             [' ', ' ', ' ', ' '],
             ['l', 'l', 'l', ' '],
@@ -75,7 +115,7 @@ const pieceStructures = [
             [' ', ' ', ' ', ' '],
         ]
     ],
-    [
+    [ShapeName.t]: [
         [
             [' ', ' ', ' ', ' '],
             ['t', 't', 't', ' '],
@@ -101,7 +141,7 @@ const pieceStructures = [
             [' ', ' ', ' ', ' '],
         ]
     ],
-    [
+    [ShapeName.s]: [
         [
             [' ', ' ', ' ', ' '],
             [' ', 's', 's', ' '],
@@ -115,7 +155,7 @@ const pieceStructures = [
             [' ', ' ', ' ', ' '],
         ]
     ],
-    [
+    [ShapeName.z]: [
         [
             [' ', ' ', ' ', ' '],
             ['z', 'z', ' ', ' '],
@@ -129,4 +169,6 @@ const pieceStructures = [
             [' ', ' ', ' ', ' '],
         ]
     ]
-];
+};
+
+export { Piece, ShapeName, Rotation };
