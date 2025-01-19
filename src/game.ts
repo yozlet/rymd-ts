@@ -44,11 +44,12 @@ class Game {
       this.canvas.addEventListener('mouseup', (_) => {
         this.nextInput.mouseDown = false;
       });
-      this.canvas.addEventListener('keydown', (event) => {
+      document.addEventListener('keydown', (event) => {
         this.nextInput.keysPressed.add(event.key);
       });
-      this.canvas.addEventListener('keyup', (event) => {
+      document.addEventListener('keyup', (event) => {
         this.nextInput.keysPressed.delete(event.key);
+        this.nextInput.keysDone.delete(event.key);
       });
     }
   
@@ -75,11 +76,7 @@ class Game {
       this.draw(deltaTime);
       requestAnimationFrame(this.gameLoop.bind(this));
     }
-  
-    public update(_deltaTime: number): void {
-      // TODO: implement update logic
-    } 
-  
+    
     public draw(_deltaTime: number): void {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.drawGrid();
@@ -88,7 +85,8 @@ class Game {
       const mouseX = Math.floor(this.currentInput.mouseX / this.BLOCK_SIZE);
       const mouseY = Math.floor(this.currentInput.mouseY / this.BLOCK_SIZE);
       // draw block outline under the mouse
-      this.drawBlockOutline(mouseX, mouseY);
+      this.drawHeldPiece(mouseX, mouseY);
+      // this.drawBlockOutline(0, 0);
     }
   
     private drawGrid(): void {
@@ -132,5 +130,24 @@ class Game {
       this.ctx.strokeRect(x * this.BLOCK_SIZE, y * this.BLOCK_SIZE, this.BLOCK_SIZE, this.BLOCK_SIZE);
     }
     
+    public update(_deltaTime: number): void {
+      // Handle key presses
+      this.handleInput(this.currentInput);
+    } 
+  
+    private handleInput(input: FrameInput): void {
+      if (input.keysPressed.has('z') && !input.keysDone.has('z')) {
+        this.world.getHeldPiece().rotateLeft();
+        this.nextInput.keysDone.add('z');
+      }
+      if (input.keysPressed.has('x') && !input.keysDone.has('x')) {
+        this.world.getHeldPiece().rotateRight();
+        this.nextInput.keysDone.add('x');
+      }
+    }
+  }
+
+  
+
   
   export { Game };
