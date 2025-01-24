@@ -38,11 +38,8 @@ class Game {
       this.canvas.addEventListener('mouseout', (_) => {
         this.nextInput.mouseOverGrid = false;
       });
-      this.canvas.addEventListener('mousedown', (_) => {
-        this.nextInput.mouseDown = true;
-      });
-      this.canvas.addEventListener('mouseup', (_) => {
-        this.nextInput.mouseDown = false;
+      this.canvas.addEventListener('click', (_) => {
+        this.nextInput.click = true;
       });
       document.addEventListener('keydown', (event) => {
         this.nextInput.keysPressed.add(event.key);
@@ -108,20 +105,10 @@ class Game {
     // Draw the outline of the held piece within the bounds of the grid
     private drawHeldPiece(xMouse: number, yMouse: number): void {
       this.ctx.strokeStyle = '#f00';
-      const piece = this.world.getHeldPiece();
-      // Get the bounding box of the piece shape, and the mouse handle position,
-      // all within the shape grid
-      const { xMin, xMax, yMin, yMax, xHandle, yHandle } = piece.getBoundingHandles();
-      const shape = piece.getShape();
-      for (let row = 0; row < shape.length; row++) {
-        for (let col = 0; col < shape[row].length; col++) {
-          if (shape[row][col] != ' ') {
-            // TODO: fix weird offset bugs where mouse seems to be off handle square
-            const xOffset = Math.min(Math.max(0, xMouse - xHandle), this.GRID_WIDTH - (xMax + 1));
-            const yOffset = Math.min(Math.max(0, yMouse - yHandle), this.GRID_HEIGHT - (yMax + 1));
-            this.ctx.strokeRect((col + xOffset - xMin) * this.BLOCK_SIZE, (row + yOffset - yMin) * this.BLOCK_SIZE, this.BLOCK_SIZE, this.BLOCK_SIZE);
-          }
-        }
+
+      const cellCoords: Array<[number, number]> = this.world.getHeldPieceCellCoords(xMouse, yMouse);
+      for (const [x, y] of cellCoords) {
+        this.ctx.strokeRect(x * this.BLOCK_SIZE, y * this.BLOCK_SIZE, this.BLOCK_SIZE, this.BLOCK_SIZE);
       }
     }
 
@@ -143,11 +130,13 @@ class Game {
       if (input.keysPressed.has('x') && !input.keysDone.has('x')) {
         this.world.getHeldPiece().rotateRight();
         this.nextInput.keysDone.add('x');
+      }``
+      if (input.click) {
+        this.world.placeHeldPiece();
+        this.nextInput.click = false;
       }
     }
   }
-
-  
 
   
   export { Game };
