@@ -132,7 +132,10 @@ class Game {
         this.nextInput.keysDone.add('x');
       }``
       if (input.click) {
-        this.world.placeHeldPiece();
+        // translate mouse position to grid position
+        const mouseX = Math.floor(input.mouseX / this.BLOCK_SIZE);
+        const mouseY = Math.floor(input.mouseY / this.BLOCK_SIZE);
+        this.world.placeHeldPiece(mouseX, mouseY);
         this.nextInput.click = false;
       }
     }

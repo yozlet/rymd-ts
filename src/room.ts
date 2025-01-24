@@ -9,8 +9,9 @@ class Room {
     public cells: Array<Cell> = [];
     public flavour: Flavour;
 
-    constructor(flavour: Flavour) {
+    constructor(flavour: Flavour, cells: Array<Cell>) {
         this.flavour = flavour;
+        this.cells = cells;
     }
 
 }
