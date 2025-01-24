@@ -61,7 +61,7 @@ class World {
         const piece = this.heldPiece;
         const pieceCellCoords = this.getHeldPieceCellCoords(x, y);
         
-        if (this.pieceCanFit(pieceCellCoords) && this.pieceCanConnect(pieceCellCoords)) {
+        if (this.pieceCanBePlacedOver(pieceCellCoords)) {
             const pieceCells = pieceCellCoords.map(([x, y]) => this.getCell(x, y));
             const room = new Room(piece.flavour, pieceCells);
             for (const cell of pieceCells) {
@@ -73,9 +73,18 @@ class World {
         return false;
     }
 
+    // Runs all the checks to see if the piece can be placed at the given coordinates
+    public pieceCanBePlacedOver(cellCoords: Array<[number, number]>): boolean {
+        return this.pieceCanFitOver(cellCoords) && this.pieceCanConnectOver(cellCoords);
+    }
+
+    public pieceCanBePlacedAt(x: number, y: number): boolean {
+        return this.pieceCanBePlacedOver(this.getHeldPieceCellCoords(x, y));
+    }
+
     // Decides ONLY if there's room for the piece at the given set of coordinates.
     // Does not check for room connections.
-    private pieceCanFit(cellCoords: Array<[number, number]>): boolean {
+    private pieceCanFitOver(cellCoords: Array<[number, number]>): boolean {
         for (const [x, y] of cellCoords) {
             if (this.getCell(x, y).isOccupied()) {
                 return false;
@@ -85,12 +94,17 @@ class World {
     }
 
     // Decides if there is an adjacent corridor cell to the piece.
-    private pieceCanConnect(cellCoords: Array<[number, number]>): boolean {
+    private pieceCanConnectOver(cellCoords: Array<[number, number]>): boolean {
         // Loop through all the cells in the piece
         for (const [x, y] of cellCoords) {
-            // Check if the cell is adjacent to a cell with a corridor room
-            if (this.getCell(x + 1, y).isCorridor() || this.getCell(x - 1, y).isCorridor() ||
-                this.getCell(x, y + 1).isCorridor() || this.getCell(x, y - 1).isCorridor()) {
+            // Check adjacent cells, but only if they're within grid boundaries
+            // TODO: in the future when we have an expanding grid that starts at zero,
+            // we should probably fix getCell to automatically return a null cell
+            // if the coordinates are out of bounds
+            if ((x + 1 < this.gridWidth && this.getCell(x + 1, y).isCorridor()) ||
+                (x - 1 >= 0 && this.getCell(x - 1, y).isCorridor()) ||
+                (y + 1 < this.gridHeight && this.getCell(x, y + 1).isCorridor()) ||
+                (y - 1 >= 0 && this.getCell(x, y - 1).isCorridor())) {
                 return true;
             }
         }

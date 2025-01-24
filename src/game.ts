@@ -104,7 +104,8 @@ class Game {
   
     // Draw the outline of the held piece within the bounds of the grid
     private drawHeldPiece(xMouse: number, yMouse: number): void {
-      this.ctx.strokeStyle = '#f00';
+      // Set stroke color to red or green depending on if the piece can be placed
+      this.ctx.strokeStyle = this.world.pieceCanBePlacedAt(xMouse, yMouse) ? '#0f0' : '#f00';
 
       const cellCoords: Array<[number, number]> = this.world.getHeldPieceCellCoords(xMouse, yMouse);
       for (const [x, y] of cellCoords) {
