@@ -1,0 +1,15 @@
+#app {
+    display: flex;
+}
+
+#flavours {
+    padding-left: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.flavour {
+    font-style: italic;
+}
+
