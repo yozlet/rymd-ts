@@ -1,4 +1,5 @@
 import { Cell } from "./cell";
+import { Flavour } from "./flavour";
 import { Piece, PieceName } from "./pieces";
 import { Room } from "./room";
 import { Flavours } from "./flavour";
@@ -35,6 +36,12 @@ class World {
 
     public getHeldPiece(): Piece {
         return this.heldPiece;
+    }
+
+    public setPieceFlavour(flavour: Flavour): void {
+        if (this.heldPiece) {
+            this.heldPiece.flavour = flavour;
+        }
     }
 
     public getHeldPieceCellCoords(x: number, y: number): Array<[number, number]> {

@@ -1,6 +1,6 @@
 import { FrameInput } from './frameinput';
 import { World } from './world';
-import { Flavour, FlavourOrder } from './flavour';
+import { Flavour, Flavours, FlavourOrder } from './flavour';
 // Class for the game
 class Game {
     private canvas: HTMLCanvasElement;
@@ -18,9 +18,7 @@ class Game {
     private nextInput = new FrameInput();
 
     // UI
-    private currentFlavour: Flavour | null = null;
-    // Highlighted element showing current flavour
-    private selectedFlavourEl: HTMLElement | null = null;
+    private defaultFlavour = Flavours.CORRIDOR;
   
     constructor() {
       this.canvas = document.querySelector<HTMLCanvasElement>('#gamecanvas')!;
@@ -30,7 +28,8 @@ class Game {
       this.setupFlavoursUI();
 
       this.world = new World(this.GRID_HEIGHT, this.GRID_WIDTH);
-  
+      this.setFlavour(this.defaultFlavour);
+
     }
   
     private setupCanvasListeners(): void {
@@ -59,7 +58,8 @@ class Game {
 
     public setupFlavoursUI(): void {
       const flavoursDiv = document.querySelector<HTMLCanvasElement>('#flavours')!;
-      const sheet = document.styleSheets[0]; // Get the first stylesheet
+      const sheet = document.styleSheets[0];
+      const game = this; // TODO: OK, seriously, what's the right way to do this
       for (let flavour of FlavourOrder) {
         let el = document.createElement("span");
         el.classList.add("flavour");
@@ -68,7 +68,20 @@ class Game {
         flavoursDiv.appendChild(el);
         sheet.insertRule(`.flavour.${flavour.name} { color: ${flavour.colour}; font-size: 20px; }`, sheet.cssRules.length);
         sheet.insertRule(`.flavour.${flavour.name}.selected { background-color: ${flavour.colour}; color: black; font-size: 20px; }`, sheet.cssRules.length);
+        el.addEventListener("click", function(): void {
+          game.setFlavour(flavour);          
+        })
       }
+    }
+
+    public setFlavour(flavour: Flavour): void {
+      let oldFlavourEl = document.querySelector(".flavour.selected");
+      let newFlavourEl = document.querySelector(`.flavour.${flavour.name}`);
+      if (oldFlavourEl !== newFlavourEl) {
+        oldFlavourEl?.classList.remove("selected");
+        newFlavourEl?.classList.add("selected");
+      }
+      this.world.setPieceFlavour(flavour);
     }
   
     public start(): void {
@@ -157,7 +170,10 @@ class Game {
         // translate mouse position to grid position
         const mouseX = Math.floor(input.mouseX / this.BLOCK_SIZE);
         const mouseY = Math.floor(input.mouseY / this.BLOCK_SIZE);
-        this.world.placeHeldPiece(mouseX, mouseY);
+        const placedOK: boolean = this.world.placeHeldPiece(mouseX, mouseY);
+        if (placedOK) {
+          this.setFlavour(this.defaultFlavour);
+        }
         this.nextInput.click = false;
       }
     }
