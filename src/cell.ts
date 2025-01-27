@@ -1,7 +1,7 @@
 // Cells are what the grid is made of.
 // Each cell is either empty space or belongs to a single Room.
 import { Room } from "./room";
-import { Flavour } from "./flavour";
+import { Flavours } from "./flavour";
 
 class Cell {
     public room: Room | null = null;
@@ -16,7 +16,7 @@ class Cell {
     }
 
     public isCorridor(): boolean {
-        return this.room !== null && this.room.flavour === Flavour.CORRIDOR;
+        return this.room !== null && this.room.flavour === Flavours.CORRIDOR;
     }
 }
 

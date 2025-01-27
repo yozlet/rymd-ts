@@ -1,7 +1,7 @@
 import { Cell } from "./cell";
 import { Piece, PieceName } from "./pieces";
 import { Room } from "./room";
-import { Flavour } from "./flavour";
+import { Flavours } from "./flavour";
 class World {
     private grid: Array<Array<Cell>>;
 
@@ -21,12 +21,12 @@ class World {
         // Middle of the grid has a corridor room
         const middleX = Math.floor(gridWidth / 2);
         const middleY = Math.floor(gridHeight / 2);
-        this.getCell(middleX, middleY).room = new Room(Flavour.CORRIDOR, [this.getCell(middleX, middleY)]);
+        this.getCell(middleX, middleY).room = new Room(Flavours.CORRIDOR, [this.getCell(middleX, middleY)]);
 
         // Start piece sequence with a two shuffled arrays of piece names
         this.pieceSequence = Piece.shufflePieceNames().concat(Piece.shufflePieceNames());
         // TODO: handle flavour picking
-        this.heldPiece = new Piece(this.pieceSequence[0], 0, Flavour.CORRIDOR);
+        this.heldPiece = new Piece(this.pieceSequence[0], 0, Flavours.CORRIDOR);
     }
 
     public getCell(x: number, y: number): Cell {
@@ -113,7 +113,7 @@ class World {
 
     private getNextPiece(): Piece {
         // TODO: handle flavour picking
-        const piece = new Piece(this.pieceSequence[0], 0, Flavour.CORRIDOR);
+        const piece = new Piece(this.pieceSequence[0], 0, Flavours.CORRIDOR);
         this.pieceSequence.shift();
         if (this.pieceSequence.length < 7) {
             this.pieceSequence.concat(Piece.shufflePieceNames());

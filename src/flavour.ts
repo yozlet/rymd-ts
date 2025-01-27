@@ -1,15 +1,20 @@
 // Flavours are the different types of rooms.
-// This is a simple enum of flavour names and colours for now.
-enum Flavour {
-    CORRIDOR = "corridor",
-    EXTRACTOR = "extractor",
-    REACTOR = "reactor"
+
+export type Flavour = {
+  name: string;
+  colour: string;
 }
 
-const FlavourColour: { [key in Flavour]: string } = {
-    [Flavour.CORRIDOR]: "#663",
-    [Flavour.EXTRACTOR]: "#A3A",
-    [Flavour.REACTOR]: "#3AA",
-  };
-  
-export { Flavour, FlavourColour };
+const FlavourOrder: Array<Flavour> = [
+  {name: "corridor", colour: "darkkhaki"},
+  {name: "extractor", colour: "orchid"},
+  {name: "reactor", colour: "cyan"},
+]
+
+const Flavours = {
+  CORRIDOR: {name: "corridor", colour: "darkkhaki"},
+  EXTRACTOR: {name: "extractor", colour: "orchid"},
+  REACTOR: {name: "reactor", colour: "cyan"},
+}
+
+export { Flavours, FlavourOrder };

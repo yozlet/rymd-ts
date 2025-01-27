@@ -1,6 +1,6 @@
 import { FrameInput } from './frameinput';
 import { World } from './world';
-import { FlavourColour } from './flavour';
+import { Flavour, FlavourOrder } from './flavour';
 // Class for the game
 class Game {
     private canvas: HTMLCanvasElement;
@@ -16,11 +16,18 @@ class Game {
     private readonly BLOCK_SIZE = 20;
     private currentInput = new FrameInput();
     private nextInput = new FrameInput();
+
+    // UI
+    private currentFlavour: Flavour | null = null;
+    // Highlighted element showing current flavour
+    private selectedFlavourEl: HTMLElement | null = null;
   
     constructor() {
       this.canvas = document.querySelector<HTMLCanvasElement>('#gamecanvas')!;
       this.ctx = this.canvas.getContext('2d')!;
       this.setupCanvasListeners();
+      // TODO: this should live in a dedicated UI class
+      this.setupFlavoursUI();
 
       this.world = new World(this.GRID_HEIGHT, this.GRID_WIDTH);
   
@@ -48,6 +55,20 @@ class Game {
         this.nextInput.keysPressed.delete(event.key);
         this.nextInput.keysDone.delete(event.key);
       });
+    }
+
+    public setupFlavoursUI(): void {
+      const flavoursDiv = document.querySelector<HTMLCanvasElement>('#flavours')!;
+      const sheet = document.styleSheets[0]; // Get the first stylesheet
+      for (let flavour of FlavourOrder) {
+        let el = document.createElement("span");
+        el.classList.add("flavour");
+        el.classList.add(flavour.name);
+        el.appendChild(document.createTextNode(flavour.name));
+        flavoursDiv.appendChild(el);
+        sheet.insertRule(`.flavour.${flavour.name} { color: ${flavour.colour}; font-size: 20px; }`, sheet.cssRules.length);
+        sheet.insertRule(`.flavour.${flavour.name}.selected { background-color: ${flavour.colour}; color: black; font-size: 20px; }`, sheet.cssRules.length);
+      }
     }
   
     public start(): void {
@@ -93,7 +114,7 @@ class Game {
         for (let col = 0; col < this.GRID_WIDTH; col++) {
             const cell = this.world.getCell(col, row);
             if (cell.room) {
-                this.ctx.fillStyle = FlavourColour[cell.room.flavour];
+                this.ctx.fillStyle = cell.room.flavour.colour;
             } else {
                 this.ctx.fillStyle = '#333';
             }
