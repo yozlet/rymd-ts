@@ -9,8 +9,8 @@ class World {
     // List of upcoming pieces
     private pieceSequence: Array<PieceName>;
     private heldPiece: Piece;
-    private gridHeight: number;
-    private gridWidth: number;
+    public gridHeight: number;
+    public gridWidth: number;
 
     constructor(gridHeight: number, gridWidth: number) {
         this.gridHeight = gridHeight;

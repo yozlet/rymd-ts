@@ -1,10 +1,11 @@
 import { FrameInput } from './frameinput';
 import { World } from './world';
-import { Flavour, Flavours, FlavourOrder } from './flavour';
+import { Flavours } from './flavour';
+import { Renderer } from './renderer';
+import { MessageRouter } from './messagerouter';
+
 // Class for the game
 class Game {
-    private canvas: HTMLCanvasElement;
-    private ctx: CanvasRenderingContext2D;
     private lastFrameTime: number = 0;
     private isRunning: boolean = false;
     
@@ -12,76 +13,47 @@ class Game {
     private readonly GRID_HEIGHT = 15;
     private readonly GRID_WIDTH = 15;
     private world: World;
+    private defaultFlavour = Flavours.CORRIDOR;
 
-    private readonly BLOCK_SIZE = 20;
+
     private currentInput = new FrameInput();
     private nextInput = new FrameInput();
-
-    // UI
-    private defaultFlavour = Flavours.CORRIDOR;
-  
+    private renderer: Renderer;
+    private messageRouter: MessageRouter;
+    
     constructor() {
-      this.canvas = document.querySelector<HTMLCanvasElement>('#gamecanvas')!;
-      this.ctx = this.canvas.getContext('2d')!;
-      this.setupCanvasListeners();
-      // TODO: this should live in a dedicated UI class
-      this.setupFlavoursUI();
-
       this.world = new World(this.GRID_HEIGHT, this.GRID_WIDTH);
-      this.setFlavour(this.defaultFlavour);
+      this.messageRouter = new MessageRouter(this.world, this);
+      this.renderer = new Renderer('#gamecanvas', this.messageRouter);
+      this.messageRouter.setRenderer(this.renderer);
 
+      this.setupCanvasListeners();
+      this.renderer.setFlavour(Flavours.CORRIDOR);
     }
   
     private setupCanvasListeners(): void {
-      this.canvas.addEventListener('mousemove', (event) => {
+      const canvas = this.renderer.getCanvas();
+      canvas.addEventListener('mousemove', (event: MouseEvent) => {
         // mouse position relative to canvas
         this.nextInput.mouseX = event.offsetX;
         this.nextInput.mouseY = event.offsetY;  
       });
-      this.canvas.addEventListener('mouseover', (_) => {
+      this.renderer.getCanvas().addEventListener('mouseover', (_: MouseEvent) => {
         this.nextInput.mouseOverGrid = true;
       });
-      this.canvas.addEventListener('mouseout', (_) => {
+      this.renderer.getCanvas().addEventListener('mouseout', (_: MouseEvent) => {
         this.nextInput.mouseOverGrid = false;
       });
-      this.canvas.addEventListener('click', (_) => {
+      this.renderer.getCanvas().addEventListener('click', (_: MouseEvent) => {
         this.nextInput.click = true;
       });
-      document.addEventListener('keydown', (event) => {
+      document.addEventListener('keydown', (event: KeyboardEvent) => {
         this.nextInput.keysPressed.add(event.key);
       });
-      document.addEventListener('keyup', (event) => {
+      document.addEventListener('keyup', (event: KeyboardEvent) => {
         this.nextInput.keysPressed.delete(event.key);
         this.nextInput.keysDone.delete(event.key);
       });
-    }
-
-    public setupFlavoursUI(): void {
-      const flavoursDiv = document.querySelector<HTMLCanvasElement>('#flavours')!;
-      const sheet = document.styleSheets[0];
-      const game = this; // TODO: OK, seriously, what's the right way to do this
-      for (let flavour of FlavourOrder) {
-        let el = document.createElement("span");
-        el.classList.add("flavour");
-        el.classList.add(flavour.name);
-        el.appendChild(document.createTextNode(flavour.name));
-        flavoursDiv.appendChild(el);
-        sheet.insertRule(`.flavour.${flavour.name} { color: ${flavour.colour}; font-size: 20px; }`, sheet.cssRules.length);
-        sheet.insertRule(`.flavour.${flavour.name}.selected { background-color: ${flavour.colour}; color: black; font-size: 20px; }`, sheet.cssRules.length);
-        el.addEventListener("click", function(): void {
-          game.setFlavour(flavour);          
-        })
-      }
-    }
-
-    public setFlavour(flavour: Flavour): void {
-      let oldFlavourEl = document.querySelector(".flavour.selected");
-      let newFlavourEl = document.querySelector(`.flavour.${flavour.name}`);
-      if (oldFlavourEl !== newFlavourEl) {
-        oldFlavourEl?.classList.remove("selected");
-        newFlavourEl?.classList.add("selected");
-      }
-      this.world.setPieceFlavour(flavour);
     }
   
     public start(): void {
@@ -92,6 +64,8 @@ class Game {
       }
     }
   
+    // Primary game loop. In the classic love2d style, 
+    // it calls update() and then draw() once per frame
     private gameLoop(currentTime: number): void {
       if (!this.isRunning) return;
   
@@ -104,59 +78,17 @@ class Game {
       // TODO: does nextInput need to be reset?
       
       this.update(deltaTime);
-      this.draw(deltaTime);
+      this.renderer.draw(this.world, deltaTime, this.currentInput);
       requestAnimationFrame(this.gameLoop.bind(this));
     }
-    
-    public draw(_deltaTime: number): void {
-      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      this.drawGrid();
-  
-      // translate mouse position to grid position
-      const mouseX = Math.floor(this.currentInput.mouseX / this.BLOCK_SIZE);
-      const mouseY = Math.floor(this.currentInput.mouseY / this.BLOCK_SIZE);
-      // draw block outline under the mouse
-      this.drawHeldPiece(mouseX, mouseY);
-      // this.drawBlockOutline(0, 0);
-    }
-  
-    private drawGrid(): void {
-      // change color to dark grey
-      this.ctx.fillStyle = '#333';
-      for (let row = 0; row < this.GRID_HEIGHT; row++) {
-        for (let col = 0; col < this.GRID_WIDTH; col++) {
-            const cell = this.world.getCell(col, row);
-            if (cell.room) {
-                this.ctx.fillStyle = cell.room.flavour.colour;
-            } else {
-                this.ctx.fillStyle = '#333';
-            }
-            this.ctx.fillRect((col * this.BLOCK_SIZE) + 1, (row * this.BLOCK_SIZE) + 1, this.BLOCK_SIZE - 2, this.BLOCK_SIZE - 2);
-        }
-      }
-    }
-  
-    // Draw the outline of the held piece within the bounds of the grid
-    private drawHeldPiece(xMouse: number, yMouse: number): void {
-      // Set stroke color to red or green depending on if the piece can be placed
-      this.ctx.strokeStyle = this.world.pieceCanBePlacedAt(xMouse, yMouse) ? '#0f0' : '#f00';
 
-      const cellCoords: Array<[number, number]> = this.world.getHeldPieceCellCoords(xMouse, yMouse);
-      for (const [x, y] of cellCoords) {
-        this.ctx.strokeRect(x * this.BLOCK_SIZE, y * this.BLOCK_SIZE, this.BLOCK_SIZE, this.BLOCK_SIZE);
-      }
-    }
-
-    private drawBlockOutline(x: number, y: number): void {
-      this.ctx.strokeStyle = '#0f0';
-      this.ctx.strokeRect(x * this.BLOCK_SIZE, y * this.BLOCK_SIZE, this.BLOCK_SIZE, this.BLOCK_SIZE);
-    }
-    
+    // Read inputs and perform associated updates, then do
+    // automated updates
     public update(_deltaTime: number): void {
       // Handle key presses
       this.handleInput(this.currentInput);
     } 
-  
+    
     private handleInput(input: FrameInput): void {
       if (input.keysPressed.has('z') && !input.keysDone.has('z')) {
         this.world.getHeldPiece().rotateLeft();
@@ -165,14 +97,14 @@ class Game {
       if (input.keysPressed.has('x') && !input.keysDone.has('x')) {
         this.world.getHeldPiece().rotateRight();
         this.nextInput.keysDone.add('x');
-      }``
+      }
       if (input.click) {
         // translate mouse position to grid position
-        const mouseX = Math.floor(input.mouseX / this.BLOCK_SIZE);
-        const mouseY = Math.floor(input.mouseY / this.BLOCK_SIZE);
+        const mouseX = Math.floor(input.mouseX / this.renderer.BLOCK_SIZE);
+        const mouseY = Math.floor(input.mouseY / this.renderer.BLOCK_SIZE);
         const placedOK: boolean = this.world.placeHeldPiece(mouseX, mouseY);
         if (placedOK) {
-          this.setFlavour(this.defaultFlavour);
+          this.renderer.setFlavour(this.defaultFlavour);
         }
         this.nextInput.click = false;
       }
