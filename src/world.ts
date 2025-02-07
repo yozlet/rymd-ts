@@ -31,6 +31,9 @@ class World {
     }
 
     public getCell(x: number, y: number): Cell {
+        if (x < 0 || x >= this.gridWidth || y < 0 || y >= this.gridHeight) {
+            throw new Error(`Cell out of bounds: ${x}, ${y} (grid size: ${this.gridWidth}x${this.gridHeight})`);
+        }
         return this.grid[y][x];
     }
 
