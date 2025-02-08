@@ -1,6 +1,5 @@
 import { FrameInput } from './frameinput';
 import { World } from './world';
-import { SignalBox } from './signalbox';
 import { UIController } from './ui-controller';
 
 export class Renderer {
@@ -10,12 +9,12 @@ export class Renderer {
     private container: HTMLElement;
     private ui: UIController;
 
-    constructor(uicontainerId: string, canvasId: string, signalBox: SignalBox) {
+    constructor(uicontainerId: string, canvasId: string) {
         this.container = document.getElementById(uicontainerId) as HTMLElement;
         this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
         this.ctx = this.canvas.getContext('2d')!;
         // this.setupFlavoursUI(messageRouter);
-        this.ui = new UIController(this.container, signalBox);
+        this.ui = new UIController(this.container);
         this.ui.render();
     }
 

@@ -3,6 +3,7 @@ import { World } from './world';
 import { Renderer } from './renderer';
 import { InputRouter } from './inputrouter';
 import { SignalBox } from './signalbox';
+
 // Class for the game
 class Game {
     private lastFrameTime: number = 0;
@@ -16,17 +17,16 @@ class Game {
     private currentInput = new FrameInput();
     private nextInput = new FrameInput();
     private renderer: Renderer;
-    private signalBox: SignalBox;
 
     constructor() {
-      this.signalBox = new SignalBox();
-      this.world = new World(this.GRID_HEIGHT, this.GRID_WIDTH, this.signalBox);
+      this.world = new World(this.GRID_HEIGHT, this.GRID_WIDTH);
       InputRouter.setGame(this);
       InputRouter.setWorld(this.world);
-      this.renderer = new Renderer('uicontainer', 'gamecanvas', this.signalBox);
+      this.renderer = new Renderer('uicontainer', 'gamecanvas');
       this.setupCanvasListeners();
     }
   
+    // TODO: move to Renderer + InputRouter
     private setupCanvasListeners(): void {
       const canvas = this.renderer.getCanvas();
       canvas.addEventListener('mousemove', (event: MouseEvent) => {
@@ -85,6 +85,7 @@ class Game {
       this.handleInput(this.currentInput);
     } 
     
+    // TODO: move to InputRouter
     private handleInput(input: FrameInput): void {
       if (input.keysPressed.has('z') && !input.keysDone.has('z')) {
         this.world.getHeldPiece().rotateLeft();

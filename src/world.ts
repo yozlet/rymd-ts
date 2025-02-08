@@ -6,6 +6,7 @@ import { Flavours } from "./flavour";
 import { SignalBox } from "./signalbox";
 import { Signal } from "@preact/signals-core";
 
+// World is where most of the game state and logic lives
 class World {
     public gridHeight: number;
     public gridWidth: number;
@@ -15,12 +16,12 @@ class World {
     private pieceSequence: Array<PieceName>;
     private heldPiece: Signal<Piece | null>;
 
-    constructor(gridHeight: number, gridWidth: number, signalBox: SignalBox) {
+    constructor(gridHeight: number, gridWidth: number) {
         this.gridHeight = gridHeight;
         this.gridWidth = gridWidth;
 
         // World has references to key signals in the signalbox
-        this.heldPiece = signalBox.heldPiece;
+        this.heldPiece = SignalBox.heldPiece;
 
         this.grid = Array.from({ length: gridHeight }, 
                                 (_, y) => Array.from({ length: gridWidth }, 

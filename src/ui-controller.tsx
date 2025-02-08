@@ -7,31 +7,26 @@ interface UIState {
 }
 
 interface UIProps {
-    signalBox: SignalBox;
 }
 
 export class UIController {
     private container: HTMLElement;
-    private signalBox: SignalBox;
-
-    constructor(container: HTMLElement, signalBox: SignalBox) {
+    
+    constructor(container: HTMLElement) {
         this.container = container;
-        this.signalBox = signalBox;
     }
 
     render() {
-        render(<UIComponent signalBox={this.signalBox}/>, this.container);
+        render(<UIComponent/>, this.container);
     }
 }
 
 export class UIComponent extends Component<UIProps, UIState> {
     //private statsContainer!: HTMLElement;
     //private debugInfo!: HTMLElement;
-    private signalBox: SignalBox;
 
     constructor(props: UIProps) {
         super(props);
-        this.signalBox = props.signalBox;
     }   
 
     render(): ComponentChildren {
@@ -44,7 +39,7 @@ export class UIComponent extends Component<UIProps, UIState> {
                         {Object.values(Flavours).map((flavour) => (
                             <button
                                 key={flavour.name}
-                                className={`flavor-btn ${this.signalBox.heldPieceFlavour.value === flavour ? 'active' : ''}`}
+                                className={`flavor-btn ${SignalBox.heldPieceFlavour.value === flavour ? 'active' : ''}`}
                                 onClick={() => InputRouter.setFlavour(flavour)}
                                 style={{ backgroundColor: flavour.colour }}
                             >
