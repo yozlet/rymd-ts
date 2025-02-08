@@ -2,14 +2,16 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { World } from '../world';
 import { Flavours } from '../flavour';
 import { Room } from '../room';
+import { SignalBox } from '../signalbox';
 
 describe('World', () => {
   const gridWidth = 10;
   const gridHeight = 10;
   let world: World;
-
+  let signalBox: SignalBox;
   beforeEach(() => {
-    world = new World(gridHeight, gridWidth);
+    signalBox = new SignalBox();
+    world = new World(gridHeight, gridWidth, signalBox);
   });
 
   describe('Grid initialization', () => {

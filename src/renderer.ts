@@ -1,48 +1,27 @@
 import { FrameInput } from './frameinput';
 import { World } from './world';
-import { Flavour, FlavourOrder } from './flavour';
-import { MessageRouter } from './messagerouter';
+import { SignalBox } from './signalbox';
+import { UIController } from './ui-controller';
 
-class Renderer {
+export class Renderer {
     private canvas: HTMLCanvasElement;
     private ctx: CanvasRenderingContext2D;
     public readonly BLOCK_SIZE = 20;
+    private container: HTMLElement;
+    private ui: UIController;
 
-    constructor(canvasId: string, messageRouter: MessageRouter) {
-        this.canvas = document.querySelector<HTMLCanvasElement>(canvasId)!;
+    constructor(uicontainerId: string, canvasId: string, signalBox: SignalBox) {
+        this.container = document.getElementById(uicontainerId) as HTMLElement;
+        this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
         this.ctx = this.canvas.getContext('2d')!;
-        this.setupFlavoursUI(messageRouter);
+        // this.setupFlavoursUI(messageRouter);
+        this.ui = new UIController(this.container, signalBox);
+        this.ui.render();
     }
 
     public getCanvas(): HTMLCanvasElement {
         return this.canvas;
     }
-
-    public setupFlavoursUI(messageRouter: MessageRouter): void {
-        const flavoursDiv = document.querySelector<HTMLCanvasElement>('#flavours')!;
-        const sheet = document.styleSheets[0];
-        for (let flavour of FlavourOrder) {
-          let el = document.createElement("span");
-          el.classList.add("flavour");
-          el.classList.add(flavour.name);
-          el.appendChild(document.createTextNode(flavour.name));
-          flavoursDiv.appendChild(el);
-          sheet.insertRule(`.flavour.${flavour.name} { color: ${flavour.colour}; font-size: 20px; }`, sheet.cssRules.length);
-          sheet.insertRule(`.flavour.${flavour.name}.selected { background-color: ${flavour.colour}; color: black; font-size: 20px; }`, sheet.cssRules.length);
-          el.addEventListener("click", function(): void {
-            messageRouter.setFlavour(flavour);
-          })
-        }
-      }
-  
-    public setFlavour(flavour: Flavour): void {
-        let oldFlavourEl = document.querySelector(".flavour.selected");
-        let newFlavourEl = document.querySelector(`.flavour.${flavour.name}`);
-        if (oldFlavourEl !== newFlavourEl) {
-            oldFlavourEl?.classList.remove("selected");
-            newFlavourEl?.classList.add("selected");
-        }
-    }   
 
     public draw(world: World, deltaTime: number, currentInput: FrameInput): void {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -85,5 +64,3 @@ class Renderer {
         this.ctx.strokeRect(x * this.BLOCK_SIZE, y * this.BLOCK_SIZE, this.BLOCK_SIZE, this.BLOCK_SIZE);
     }
 }
-
-export { Renderer }; 

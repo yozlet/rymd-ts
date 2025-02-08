@@ -3,18 +3,25 @@ import { Flavour } from "./flavour";
 import { Piece, PieceName } from "./pieces";
 import { Room } from "./room";
 import { Flavours } from "./flavour";
+import { SignalBox } from "./signalbox";
+import { Signal } from "@preact/signals-core";
+
 class World {
+    public gridHeight: number;
+    public gridWidth: number;
     private grid: Array<Array<Cell>>;
 
     // List of upcoming pieces
     private pieceSequence: Array<PieceName>;
-    private heldPiece: Piece;
-    public gridHeight: number;
-    public gridWidth: number;
+    private heldPiece: Signal<Piece | null>;
 
-    constructor(gridHeight: number, gridWidth: number) {
+    constructor(gridHeight: number, gridWidth: number, signalBox: SignalBox) {
         this.gridHeight = gridHeight;
         this.gridWidth = gridWidth;
+
+        // World has references to key signals in the signalbox
+        this.heldPiece = signalBox.heldPiece;
+
         this.grid = Array.from({ length: gridHeight }, 
                                 (_, y) => Array.from({ length: gridWidth }, 
                                                  (_, x) => new Cell(x, y)));
@@ -27,7 +34,7 @@ class World {
         // Start piece sequence with a two shuffled arrays of piece names
         this.pieceSequence = Piece.shufflePieceNames().concat(Piece.shufflePieceNames());
         // TODO: handle flavour picking
-        this.heldPiece = new Piece(this.pieceSequence[0], 0, Flavours.CORRIDOR);
+        this.heldPiece.value = new Piece(this.pieceSequence[0], 0, Flavours.CORRIDOR);
     }
 
     public getCell(x: number, y: number): Cell {
@@ -38,13 +45,11 @@ class World {
     }
 
     public getHeldPiece(): Piece {
-        return this.heldPiece;
+        return this.heldPiece.value!;
     }
 
     public setPieceFlavour(flavour: Flavour): void {
-        if (this.heldPiece) {
-            this.heldPiece.flavour = flavour;
-        }
+        this.heldPiece.value!.flavour = flavour;
     }
 
     public getHeldPieceCellCoords(x: number, y: number): Array<[number, number]> {
@@ -68,7 +73,7 @@ class World {
     }
 
     public placeHeldPiece(x: number, y: number): boolean {
-        const piece = this.heldPiece;
+        const piece = this.heldPiece.value!;
         const pieceCellCoords = this.getHeldPieceCellCoords(x, y);
         
         if (this.pieceCanBePlacedOver(pieceCellCoords)) {
@@ -77,7 +82,7 @@ class World {
             for (const cell of pieceCells) {
                 cell.room = room;
             }
-            this.heldPiece = this.getNextPiece();
+            this.heldPiece.value = this.getNextPiece();
             return true;
         }
         return false;

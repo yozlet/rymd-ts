@@ -14,5 +14,9 @@
     "test": "vitest",
     "coverage": "vitest run --coverage"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "@preact/signals-core": "^1.8.0",
+    "preact": "^10.25.4"
+  }
 }

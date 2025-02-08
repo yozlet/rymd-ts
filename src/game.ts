@@ -1,9 +1,8 @@
 import { FrameInput } from './frameinput';
 import { World } from './world';
-import { Flavours } from './flavour';
 import { Renderer } from './renderer';
-import { MessageRouter } from './messagerouter';
-
+import { InputRouter } from './inputrouter';
+import { SignalBox } from './signalbox';
 // Class for the game
 class Game {
     private lastFrameTime: number = 0;
@@ -13,22 +12,19 @@ class Game {
     private readonly GRID_HEIGHT = 15;
     private readonly GRID_WIDTH = 15;
     private world: World;
-    private defaultFlavour = Flavours.CORRIDOR;
-
 
     private currentInput = new FrameInput();
     private nextInput = new FrameInput();
     private renderer: Renderer;
-    private messageRouter: MessageRouter;
-    
-    constructor() {
-      this.world = new World(this.GRID_HEIGHT, this.GRID_WIDTH);
-      this.messageRouter = new MessageRouter(this.world, this);
-      this.renderer = new Renderer('#gamecanvas', this.messageRouter);
-      this.messageRouter.setRenderer(this.renderer);
+    private signalBox: SignalBox;
 
+    constructor() {
+      this.signalBox = new SignalBox();
+      this.world = new World(this.GRID_HEIGHT, this.GRID_WIDTH, this.signalBox);
+      InputRouter.setGame(this);
+      InputRouter.setWorld(this.world);
+      this.renderer = new Renderer('uicontainer', 'gamecanvas', this.signalBox);
       this.setupCanvasListeners();
-      this.renderer.setFlavour(Flavours.CORRIDOR);
     }
   
     private setupCanvasListeners(): void {
@@ -103,9 +99,6 @@ class Game {
         const mouseX = Math.floor(input.mouseX / this.renderer.BLOCK_SIZE);
         const mouseY = Math.floor(input.mouseY / this.renderer.BLOCK_SIZE);
         const placedOK: boolean = this.world.placeHeldPiece(mouseX, mouseY);
-        if (placedOK) {
-          this.renderer.setFlavour(this.defaultFlavour);
-        }
         this.nextInput.click = false;
       }
     }
