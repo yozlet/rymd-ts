@@ -1,6 +1,7 @@
 import { FrameInput } from './frameinput';
 import { World } from './world';
 import { UIController } from './ui-controller';
+import { SignalBox } from './signalbox';
 
 export class Renderer {
     private canvas: HTMLCanvasElement;
@@ -28,6 +29,7 @@ export class Renderer {
         
         const mouseX = Math.floor(currentInput.mouseX / this.BLOCK_SIZE);
         const mouseY = Math.floor(currentInput.mouseY / this.BLOCK_SIZE);
+        SignalBox.heldPiecePosition.value = { x: mouseX, y: mouseY };
         this.drawHeldPiece(world, mouseX, mouseY);
     }
 

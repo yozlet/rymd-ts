@@ -19,6 +19,7 @@ function UIComponent(): JSX.Element {
     return (
         <div id="ui-container">
             <FlavourList/>
+            <h3>Mouse: {SignalBox.heldPiecePosition.value.x}, {SignalBox.heldPiecePosition.value.y}</h3>
         </div>
     );
 }   

@@ -56,7 +56,8 @@ class World {
         SignalBox.heldPieceFlavour.value = flavour;
     }
 
-    public getHeldPieceCellCoords(x: number, y: number): Array<[number, number]> {
+    // Returns the coordinates of each cell in the held piece, relative to the mouse position
+    public getHeldPieceCellCoords(xMouse: number, yMouse: number): Array<[number, number]> {
         const piece = this.getHeldPiece();
         // Get the bounding box of the piece shape, and the mouse handle position,
         // all within the shape grid
@@ -67,8 +68,8 @@ class World {
           for (let col = 0; col < shape[row].length; col++) {
             if (shape[row][col] != ' ') {
               // TODO: fix weird offset bugs where mouse seems to be off handle square
-              const xOffset = Math.min(Math.max(0, x - xHandle), this.gridWidth - (xMax + 1));
-              const yOffset = Math.min(Math.max(0, y - yHandle), this.gridHeight - (yMax + 1));
+              const xOffset = Math.min(Math.max(0, xMouse - xHandle), this.gridWidth - (xMax + 1));
+              const yOffset = Math.min(Math.max(0, yMouse - yHandle), this.gridHeight - (yMax + 1));
               cellCoords.push([col + xOffset - xMin, row + yOffset - yMin]);
             }
           }
