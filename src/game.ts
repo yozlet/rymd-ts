@@ -2,8 +2,6 @@ import { FrameInput } from './frameinput';
 import { World } from './world';
 import { Renderer } from './renderer';
 import { InputRouter } from './inputrouter';
-import { SignalBox } from './signalbox';
-
 // Class for the game
 class Game {
     private lastFrameTime: number = 0;

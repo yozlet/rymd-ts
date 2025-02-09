@@ -1,4 +1,4 @@
-import { signal, computed, ReadonlySignal } from "@preact/signals-core";
+import { signal } from "@preact/signals";
 import { Piece } from "./pieces";
 import { Flavour, Flavours } from "./flavour";
 
