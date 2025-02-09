@@ -15,14 +15,17 @@ class World {
     // List of upcoming pieces
     private pieceSequence: Array<PieceName>;
     private heldPiece: Signal<Piece | null>;
-
+    private heldPieceFlavour: Signal<Flavour>;
+    
     constructor(gridHeight: number, gridWidth: number) {
         this.gridHeight = gridHeight;
         this.gridWidth = gridWidth;
 
         // World has references to key signals in the signalbox
         this.heldPiece = SignalBox.heldPiece;
+        this.heldPieceFlavour = SignalBox.heldPieceFlavour;
 
+        // Create the grid
         this.grid = Array.from({ length: gridHeight }, 
                                 (_, y) => Array.from({ length: gridWidth }, 
                                                  (_, x) => new Cell(x, y)));
@@ -35,7 +38,7 @@ class World {
         // Start piece sequence with a two shuffled arrays of piece names
         this.pieceSequence = Piece.shufflePieceNames().concat(Piece.shufflePieceNames());
         // TODO: handle flavour picking
-        this.heldPiece.value = new Piece(this.pieceSequence[0], 0, Flavours.CORRIDOR);
+        this.heldPiece.value = new Piece(this.pieceSequence[0], 0);
     }
 
     public getCell(x: number, y: number): Cell {
@@ -50,7 +53,7 @@ class World {
     }
 
     public setPieceFlavour(flavour: Flavour): void {
-        this.heldPiece.value!.flavour = flavour;
+        SignalBox.heldPieceFlavour.value = flavour;
     }
 
     public getHeldPieceCellCoords(x: number, y: number): Array<[number, number]> {
@@ -74,16 +77,16 @@ class World {
     }
 
     public placeHeldPiece(x: number, y: number): boolean {
-        const piece = this.heldPiece.value!;
         const pieceCellCoords = this.getHeldPieceCellCoords(x, y);
         
         if (this.pieceCanBePlacedOver(pieceCellCoords)) {
             const pieceCells = pieceCellCoords.map(([x, y]) => this.getCell(x, y));
-            const room = new Room(piece.flavour, pieceCells);
+            const room = new Room(this.heldPieceFlavour.value, pieceCells);
             for (const cell of pieceCells) {
                 cell.room = room;
             }
             this.heldPiece.value = this.getNextPiece();
+            this.heldPieceFlavour.value = Flavours.CORRIDOR;
             return true;
         }
         return false;
@@ -129,7 +132,7 @@ class World {
 
     private getNextPiece(): Piece {
         // TODO: handle flavour picking
-        const piece = new Piece(this.pieceSequence[0], 0, Flavours.CORRIDOR);
+        const piece = new Piece(this.pieceSequence[0], 0);
         this.pieceSequence.shift();
         if (this.pieceSequence.length < 7) {
             this.pieceSequence.concat(Piece.shufflePieceNames());

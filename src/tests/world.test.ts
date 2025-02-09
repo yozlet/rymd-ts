@@ -37,13 +37,6 @@ describe('World', () => {
     });
   });
 
-  describe('setPieceFlavour', () => {
-    it('updates held piece flavour correctly', () => {
-      world.setPieceFlavour(Flavours.REACTOR);
-      expect(world.getHeldPiece().flavour).toEqual(Flavours.REACTOR);
-    });
-  });
-
   describe('placeHeldPiece', () => {  
     it('places held piece if valid and updates held piece', () => {
       // Attempt to place the held piece near the center

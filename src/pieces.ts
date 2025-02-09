@@ -1,17 +1,13 @@
-import { Flavour } from "./flavour";
-
 export type PieceName = 'i' | 'o' | 'j' | 'l' | 't' | 's' | 'z';
 
 class Piece {
     public pieceName: PieceName;
     public rotation: number;
-    public flavour: Flavour;
     private static pieceNames: Array<PieceName> = ['i', 'o', 'j', 'l', 't', 's', 'z'];
 
-    constructor(shapeName: PieceName, rotation: number, flavour: Flavour) {
+    constructor(shapeName: PieceName, rotation: number) {
         this.pieceName = shapeName;
         this.rotation = rotation;
-        this.flavour = flavour;
     }
 
     public rotateRight(): void {
