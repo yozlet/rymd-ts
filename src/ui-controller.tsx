@@ -2,17 +2,12 @@ import { render, JSX } from 'preact';
 import { Flavours } from './flavour';
 import { SignalBox } from './signalbox';
 import { InputRouter } from './inputrouter';
-import { effect } from '@preact/signals';
 
 export class UIController {
     private container: HTMLElement;
     
     constructor(container: HTMLElement) {
         this.container = container;
-
-        effect(() => {
-            console.log(`Flavour: ${SignalBox.heldPieceFlavour.value.name}`);
-        });
     }
 
     render() {
@@ -27,8 +22,6 @@ function UIComponent(): JSX.Element {
         </div>
     );
 }   
-
-
 
 function FlavourList(): JSX.Element {
     return (
