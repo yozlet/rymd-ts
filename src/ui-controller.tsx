@@ -9,6 +9,10 @@ export class UIController {
     
     constructor(container: HTMLElement) {
         this.container = container;
+
+        effect(() => {
+            console.log(`Flavour: ${SignalBox.heldPieceFlavour.value.name}`);
+        });
     }
 
     render() {
