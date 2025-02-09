@@ -11,5 +11,10 @@
 
 .flavour {
     font-style: italic;
+    font-weight: normal;
 }
 
+.flavour.active {
+    font-style: normal;
+    font-weight: bold;
+}
