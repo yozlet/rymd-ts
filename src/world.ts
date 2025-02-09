@@ -64,10 +64,9 @@ class World {
         const { xMin, xMax, yMin, yMax, xHandle, yHandle } = piece.getBoundingHandles();
         const shape = piece.getShape();
         let cellCoords: Array<[number, number]> = [];
-        for (let row = 0; row < shape.length; row++) {
-          for (let col = 0; col < shape[row].length; col++) {
+        for (let row = yMin; row <= yMax; row++) {
+          for (let col = xMin; col <= xMax; col++) {
             if (shape[row][col] != ' ') {
-              // TODO: fix weird offset bugs where mouse seems to be off handle square
               const xOffset = Math.min(Math.max(0, xMouse - xHandle), this.gridWidth - (xMax + 1));
               const yOffset = Math.min(Math.max(0, yMouse - yHandle), this.gridHeight - (yMax + 1));
               cellCoords.push([col + xOffset - xMin, row + yOffset - yMin]);
