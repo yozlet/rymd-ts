@@ -1,5 +1,6 @@
 #app {
     display: flex;
+    font-family: "HelveticaNeue Light Condensed", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 }
 
 #flavours {
@@ -15,6 +16,5 @@
 }
 
 .flavour.active {
-    font-style: normal;
     font-weight: bold;
 }
