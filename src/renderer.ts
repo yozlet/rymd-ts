@@ -23,26 +23,36 @@ export class Renderer {
         return this.canvas;
     }
 
-    public draw(world: World, deltaTime: number, currentInput: FrameInput): void {
+    public getMouseGridPosition(mousePixelX: number, mousePixelY: number): { mouseGridX: number, mouseGridY: number } {
+        const pixelXRatio = this.canvas.clientWidth / this.canvas.width;
+        const pixelYRatio = this.canvas.clientHeight / this.canvas.height;
+        const mouseGridX = Math.floor((mousePixelX / pixelXRatio) / this.BLOCK_SIZE);
+        const mouseGridY = Math.floor((mousePixelY / pixelYRatio) / this.BLOCK_SIZE);
+        return { mouseGridX: mouseGridX, mouseGridY: mouseGridY };
+    }
+
+    public draw(world: World, currentInput: FrameInput): void {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.drawGrid(world);
         
-        const mouseX = Math.floor(currentInput.mouseX / this.BLOCK_SIZE);
-        const mouseY = Math.floor(currentInput.mouseY / this.BLOCK_SIZE);
-        SignalBox.heldPiecePosition.value = { x: mouseX, y: mouseY };
-        this.drawHeldPiece(world, mouseX, mouseY);
+        // Canvas clientHeight and clientWidth are the size in screen pixels.
+        // Need to adjust the pixel size ratio to match the block size. 
+        const {mouseGridX, mouseGridY} = this.getMouseGridPosition(currentInput.mouseX, currentInput.mouseY);
+        SignalBox.heldPiecePosition.value = { x: mouseGridX, y: mouseGridY };
+        SignalBox.mousePixels.value = { x: currentInput.mouseX, y: currentInput.mouseY };
+        this.drawHeldPiece(world, mouseGridX, mouseGridY);
     }
 
     private drawGrid(world: World): void {
         // change color to dark grey
-        this.ctx.fillStyle = '#333';
+        this.ctx.fillStyle = '#0E1117';
         for (let row = 0; row < world.gridHeight; row++) {
             for (let col = 0; col < world.gridWidth; col++) {
                 const cell = world.getCell(col, row);
                 if (cell.room) {
                     this.ctx.fillStyle = cell.room.flavour.colour;
                 } else {
-                    this.ctx.fillStyle = '#333';
+                    this.ctx.fillStyle = '#0E1117';
                 }
                 this.ctx.fillRect((col * this.BLOCK_SIZE) + 1, (row * this.BLOCK_SIZE) + 1, this.BLOCK_SIZE - 2, this.BLOCK_SIZE - 2);
             }

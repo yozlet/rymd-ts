@@ -72,7 +72,7 @@ class Game {
       // TODO: does nextInput need to be reset?
       
       this.update(deltaTime);
-      this.renderer.draw(this.world, deltaTime, this.currentInput);
+      this.renderer.draw(this.world, this.currentInput);
       requestAnimationFrame(this.gameLoop.bind(this));
     }
 
@@ -95,9 +95,8 @@ class Game {
       }
       if (input.click) {
         // translate mouse position to grid position
-        const mouseX = Math.floor(input.mouseX / this.renderer.BLOCK_SIZE);
-        const mouseY = Math.floor(input.mouseY / this.renderer.BLOCK_SIZE);
-        const placedOK: boolean = this.world.placeHeldPiece(mouseX, mouseY);
+        const {mouseGridX, mouseGridY} = this.renderer.getMouseGridPosition(input.mouseX, input.mouseY);
+        const placedOK: boolean = this.world.placeHeldPiece(mouseGridX, mouseGridY);
         this.nextInput.click = false;
       }
     }
