@@ -2,6 +2,7 @@ import { FrameInput } from './frameinput';
 import { World } from './world';
 import { UIController } from './ui-controller';
 import { SignalBox } from './signalbox';
+import { InputRouter } from './inputrouter';
 
 export class Renderer {
     private canvas: HTMLCanvasElement;
@@ -14,7 +15,7 @@ export class Renderer {
         this.container = document.getElementById(uicontainerId) as HTMLElement;
         this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
         this.ctx = this.canvas.getContext('2d')!;
-        // this.setupFlavoursUI(messageRouter);
+        this.setupCanvasListeners(this.canvas);
         this.ui = new UIController(this.container);
         this.ui.render();
     }
@@ -22,6 +23,30 @@ export class Renderer {
     public getCanvas(): HTMLCanvasElement {
         return this.canvas;
     }
+
+    public setupCanvasListeners(canvas: HTMLCanvasElement): void {
+        canvas.addEventListener('mousemove', (event: MouseEvent) => {
+            const {mouseGridX, mouseGridY} = this.getMouseGridPosition(event.offsetX, event.offsetY);
+            InputRouter.registerMouseMove(event.offsetX, event.offsetY, mouseGridX, mouseGridY);
+        });
+        canvas.addEventListener('mouseover', (event: MouseEvent) => {
+            const {mouseGridX, mouseGridY} = this.getMouseGridPosition(event.offsetX, event.offsetY);
+            InputRouter.registerMouseOver(event.offsetX, event.offsetY, mouseGridX, mouseGridY);
+        });
+        canvas.addEventListener('mouseout', (_: MouseEvent) => {
+            InputRouter.registerMouseOut();
+        });
+        canvas.addEventListener('click', (event: MouseEvent) => {
+            const {mouseGridX, mouseGridY} = this.getMouseGridPosition(event.offsetX, event.offsetY);
+            InputRouter.registerClick(event.offsetX, event.offsetY, mouseGridX, mouseGridY);
+        });
+        document.addEventListener('keydown', (event: KeyboardEvent) => {
+            InputRouter.registerKeyDown(event.key);
+        });
+        document.addEventListener('keyup', (event: KeyboardEvent) => {
+            InputRouter.registerKeyUp(event.key);
+        });
+    }   
 
     public getMouseGridPosition(mousePixelX: number, mousePixelY: number): { mouseGridX: number, mouseGridY: number } {
         const pixelXRatio = this.canvas.clientWidth / this.canvas.width;
@@ -37,9 +62,9 @@ export class Renderer {
         
         // Canvas clientHeight and clientWidth are the size in screen pixels.
         // Need to adjust the pixel size ratio to match the block size. 
-        const {mouseGridX, mouseGridY} = this.getMouseGridPosition(currentInput.mouseX, currentInput.mouseY);
+        const {mouseGridX, mouseGridY} = this.getMouseGridPosition(currentInput.mouseX!, currentInput.mouseY!);
         SignalBox.heldPiecePosition.value = { x: mouseGridX, y: mouseGridY };
-        SignalBox.mousePixels.value = { x: currentInput.mouseX, y: currentInput.mouseY };
+        SignalBox.mousePixels.value = { x: currentInput.mouseX!, y: currentInput.mouseY! };
         this.drawHeldPiece(world, mouseGridX, mouseGridY);
     }
 
@@ -70,7 +95,7 @@ export class Renderer {
         }
     }
 
-    private drawBlockOutline(world: World, x: number, y: number): void {
+    private drawBlockOutline(x: number, y: number): void {
         this.ctx.strokeStyle = '#0f0';
         this.ctx.strokeRect(x * this.BLOCK_SIZE, y * this.BLOCK_SIZE, this.BLOCK_SIZE, this.BLOCK_SIZE);
     }
