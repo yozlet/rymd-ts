@@ -66,6 +66,7 @@ export class Renderer {
     public draw(world: World, currentInput: FrameInput): void {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.drawGrid(world);
+        this.drawMinions(world);
         
         SignalBox.heldPiecePosition.value = { x: currentInput.mouseGridX, y: currentInput.mouseGridY };
         SignalBox.mousePixels.value = { x: currentInput.mouseX, y: currentInput.mouseY };
@@ -98,6 +99,20 @@ export class Renderer {
         const cellCoords: Array<[number, number]> = world.getHeldPieceCellCoords(xMouse, yMouse);
         for (const [x, y] of cellCoords) {
             this.ctx.strokeRect(x * this.BLOCK_SIZE, y * this.BLOCK_SIZE, this.BLOCK_SIZE, this.BLOCK_SIZE);
+        }
+    }
+
+    // New method: Draw each minion as a small white rectangle.
+    private drawMinions(world: World): void {
+        this.ctx.fillStyle = "#fff"; // white color for minions
+        for (const minion of world.minions) {
+            // Draw a smaller rectangle inside the cell (with a small margin)
+            this.ctx.fillRect(
+                minion.currentCell.x * this.BLOCK_SIZE + 2, 
+                minion.currentCell.y * this.BLOCK_SIZE + 3, 
+                this.BLOCK_SIZE - 8, 
+                this.BLOCK_SIZE - 8
+            );
         }
     }
 

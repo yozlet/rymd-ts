@@ -29,7 +29,8 @@ class Game {
     }
   
     // Primary game loop. In the classic love2d style, 
-    // it calls update() and then draw() once per frame
+    // it calls update() and then draw() once per frame.
+    // currentTime is the current time in milliseconds.
     private gameLoop(currentTime: number): void {
       if (!this.isRunning) return;
   
@@ -42,10 +43,12 @@ class Game {
     }
 
     // Read inputs and perform associated updates, then do
-    // automated updates
+    // automated updates.
+    // deltaTime is the time since the last frame in milliseconds.
     public update(_deltaTime: number): void {
       // Handle key presses
       InputRouter.handleInputForFrame();
+      this.world.update(_deltaTime);
     } 
   }
   

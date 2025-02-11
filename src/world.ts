@@ -5,6 +5,7 @@ import { Room } from "./room";
 import { Flavours } from "./flavour";
 import { SignalBox } from "./signalbox";
 import { Signal } from "@preact/signals-core";
+import { Minion } from "./minion";
 
 // World is where most of the game state and logic lives
 class World {
@@ -17,6 +18,9 @@ class World {
     private heldPiece: Signal<Piece | null>;
     private heldPieceFlavour: Signal<Flavour>;
     
+    // Array holding active minions in the world
+    public minions: Array<Minion> = [];
+
     constructor(gridHeight: number, gridWidth: number) {
         this.gridHeight = gridHeight;
         this.gridWidth = gridWidth;
@@ -85,6 +89,11 @@ class World {
             for (const cell of pieceCells) {
                 cell.room = room;
             }
+            if (room.flavour === Flavours.QUARTERS) {
+                const midIndex = Math.floor(pieceCells.length / 2);
+                const initialCell = pieceCells[midIndex];
+                this.minions.push(new Minion(initialCell));
+            }
             this.heldPiece.value = this.getNextPiece();
             this.heldPieceFlavour.value = Flavours.CORRIDOR;
             return true;
@@ -135,9 +144,17 @@ class World {
         const piece = new Piece(this.pieceSequence[0], 0);
         this.pieceSequence.shift();
         if (this.pieceSequence.length < 7) {
-            this.pieceSequence.concat(Piece.shufflePieceNames());
+            this.pieceSequence = this.pieceSequence.concat(Piece.shufflePieceNames());
         }
         return piece;
+    }
+
+    // New update method to advance minion movement.
+    // dt is the time since the last frame in milliseconds.
+    public update(dt: number): void {
+        for (const minion of this.minions) {
+            minion.update(dt, this);
+        }
     }
 }
 
