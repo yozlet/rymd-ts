@@ -7,6 +7,6 @@ import { Flavour, Flavours } from "./flavour";
 export class SignalBox {
     public static heldPiece = signal<Piece | null>(null);
     public static heldPieceFlavour = signal<Flavour>(Flavours.CORRIDOR);
-    public static heldPiecePosition = signal<{ x: number, y: number }>({ x: 0, y: 0 });
-    public static mousePixels = signal<{ x: number, y: number }>({ x: 0, y: 0 });
+    public static heldPiecePosition = signal<{ x: number | null, y: number | null }>({ x: null, y: null });
+    public static mousePixels = signal<{ x: number | null, y: number | null }>({ x: null, y: null });
 }

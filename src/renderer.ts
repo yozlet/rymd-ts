@@ -48,7 +48,10 @@ export class Renderer {
         });
     }   
 
+    // Get the mouse position in grid blocks on the canvas
     public getMouseGridPosition(mousePixelX: number, mousePixelY: number): { mouseGridX: number, mouseGridY: number } {
+        // Canvas clientHeight and clientWidth are the size in screen pixels.
+        // Need to adjust the pixel size ratio to match the block size. 
         const pixelXRatio = this.canvas.clientWidth / this.canvas.width;
         const pixelYRatio = this.canvas.clientHeight / this.canvas.height;
         const mouseGridX = Math.floor((mousePixelX / pixelXRatio) / this.BLOCK_SIZE);
@@ -56,16 +59,19 @@ export class Renderer {
         return { mouseGridX: mouseGridX, mouseGridY: mouseGridY };
     }
 
+    // This is the primary draw function, called once per frame.
+    // It draws the state of the world, and the held piece.
+    // (It does NOT update the HTML UI - UIController does that in 
+    // response to signals.)
     public draw(world: World, currentInput: FrameInput): void {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.drawGrid(world);
         
-        // Canvas clientHeight and clientWidth are the size in screen pixels.
-        // Need to adjust the pixel size ratio to match the block size. 
-        const {mouseGridX, mouseGridY} = this.getMouseGridPosition(currentInput.mouseX!, currentInput.mouseY!);
-        SignalBox.heldPiecePosition.value = { x: mouseGridX, y: mouseGridY };
-        SignalBox.mousePixels.value = { x: currentInput.mouseX!, y: currentInput.mouseY! };
-        this.drawHeldPiece(world, mouseGridX, mouseGridY);
+        SignalBox.heldPiecePosition.value = { x: currentInput.mouseGridX, y: currentInput.mouseGridY };
+        SignalBox.mousePixels.value = { x: currentInput.mouseX, y: currentInput.mouseY };
+        if (currentInput.mouseGridX !== null && currentInput.mouseGridY !== null) {
+            this.drawHeldPiece(world, currentInput.mouseGridX, currentInput.mouseGridY);
+        }
     }
 
     private drawGrid(world: World): void {
