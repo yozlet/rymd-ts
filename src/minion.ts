@@ -7,7 +7,6 @@ if (import.meta.hot) {
   import.meta.hot.accept(HMREventHandler)
 }
 
-
 // Minion: a little white entity that moves 1 cell per second along a corridor path.
 // It picks a random corridor cell as its destination and uses a simple BFS to pathfind.
 export default class Minion {
@@ -18,6 +17,16 @@ export default class Minion {
 
     constructor(initialCell: Cell) {
         this.currentCell = initialCell;
+    }
+
+    // Runs when the module is being swapped by Vite's Hot Module Reload.
+	// Here we copy the state from the old module instance
+	hotReload(oldModule: Minion) {
+        console.log("hotReloading Minion");
+        this.currentCell = oldModule.currentCell;
+        this.destinationCell = oldModule.destinationCell;
+        this.path = oldModule.path;
+        this.accumulatedTime = oldModule.accumulatedTime;
     }
 
     // Update minion position; dt is the time delta (in milliseconds)
@@ -53,7 +62,7 @@ export default class Minion {
         const randomIndex = Math.floor(Math.random() * potentialCells.length);
         this.destinationCell = potentialCells[randomIndex];
         this.path = this.findPath(world, this.currentCell, this.destinationCell);
-        console.log(`Minion picked new task: heading to ${this.destinationCell.x},${this.destinationCell.y} using path ${this.path.map(cell => `${cell.x},${cell.y}`).join(',')}`);
+        console.log(`Minion picked new task: heading to ${this.destinationCell.x},${this.destinationCell.y} using path ${this.path.map(cell => `[${cell.x},${cell.y}] `).join(',')}`);
     }
 
     // Compute a path from start to goal (BFS).
