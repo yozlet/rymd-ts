@@ -1,11 +1,17 @@
 import { render, JSX } from 'preact';
 import { Flavours } from './flavour';
-import { SignalBox } from './signalbox';
-import { InputRouter } from './inputrouter';
+import SignalBox from './signalbox';
+import InputRouter from './inputrouter';
 
-export class UIController {
+import { HMREventHandler } from './hotmodulereloadsetup';
+
+if (import.meta.hot) {
+  import.meta.hot.accept(HMREventHandler)
+}
+
+export default class UIController {
     private container: HTMLElement;
-    
+
     constructor(container: HTMLElement) {
         this.container = container;
     }
@@ -14,16 +20,14 @@ export class UIController {
         render(<UIComponent/>, this.container);
     }
 }
- 
+
 function UIComponent(): JSX.Element {
     return (
         <div id="ui-container">
             <FlavourList/>
-            <p>Mouse Grid:<br/>{SignalBox.heldPiecePosition.value.x}, {SignalBox.heldPiecePosition.value.y}</p>
-            <p>Mouse Pixels:<br/>{SignalBox.mousePixels.value.x}, {SignalBox.mousePixels.value.y}</p>
         </div>
     );
-}   
+}
 
 function FlavourList(): JSX.Element {
     return (

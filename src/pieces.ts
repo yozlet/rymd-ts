@@ -1,6 +1,13 @@
+import { HMREventHandler } from './hotmodulereloadsetup';
+
+if (import.meta.hot) {
+  import.meta.hot.accept(HMREventHandler)
+}
+
+
 export type PieceName = 'i' | 'o' | 'j' | 'l' | 't' | 's' | 'z';
 
-class Piece {
+export default class Piece {
     public pieceName: PieceName;
     public rotation: number;
     private static pieceNames: Array<PieceName> = ['i', 'o', 'j', 'l', 't', 's', 'z'];
@@ -158,8 +165,5 @@ class Piece {
             ]
         ]
     };
-    
 }
-
-
-export { Piece };
+;

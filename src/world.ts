@@ -1,14 +1,19 @@
 import { Cell } from "./cell";
-import { Flavour } from "./flavour";
-import { Piece, PieceName } from "./pieces";
-import { Room } from "./room";
-import { Flavours } from "./flavour";
-import { SignalBox } from "./signalbox";
-import { Signal } from "@preact/signals-core";
-import { Minion } from "./minion";
+import Flavour, { Flavours } from "./flavour";
+import Piece, { PieceName } from "./pieces";
+import Room from "./room";
+import SignalBox from "./signalbox";
+import { Signal } from "@preact/signals";
+import Minion from "./minion";
+
+import { HMREventHandler } from './hotmodulereloadsetup';
+
+if (import.meta.hot) {
+  import.meta.hot.accept(HMREventHandler)
+}
 
 // World is where most of the game state and logic lives
-class World {
+export default class World {
     public gridHeight: number;
     public gridWidth: number;
     private grid: Array<Array<Cell>>;
@@ -17,7 +22,7 @@ class World {
     private pieceSequence: Array<PieceName>;
     private heldPiece: Signal<Piece | null>;
     private heldPieceFlavour: Signal<Flavour>;
-    
+
     // Array holding active minions in the world
     public minions: Array<Minion> = [];
 
@@ -44,6 +49,20 @@ class World {
         // TODO: handle flavour picking
         this.heldPiece.value = new Piece(this.pieceSequence[0], 0);
     }
+
+    // Runs when the module is being swapped by Vite's Hot Module Reload.
+	// Here we copy the state from the old module instance
+	hotReload(oldModule: World) {
+        console.log("hotReloading World");
+        this.gridHeight = oldModule.gridHeight;
+        this.gridWidth = oldModule.gridWidth;
+        this.grid = oldModule.grid;
+        this.pieceSequence = oldModule.pieceSequence;
+        this.heldPiece.value = oldModule.heldPiece.value;
+        this.heldPieceFlavour.value = oldModule.heldPieceFlavour.value;
+        this.minions = oldModule.minions;
+	}
+
 
     public getCell(x: number, y: number): Cell {
         if (x < 0 || x >= this.gridWidth || y < 0 || y >= this.gridHeight) {
@@ -157,5 +176,3 @@ class World {
         }
     }
 }
-
-export { World };

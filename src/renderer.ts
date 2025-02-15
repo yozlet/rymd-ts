@@ -1,10 +1,16 @@
-import { FrameInput } from './frameinput';
-import { World } from './world';
-import { UIController } from './ui-controller';
-import { SignalBox } from './signalbox';
-import { InputRouter } from './inputrouter';
+import FrameInput from './frameinput';
+import World from './world';
+import UIController from './ui-controller';
+import SignalBox from './signalbox';
+import InputRouter from './inputrouter';
 
-export class Renderer {
+import { HMREventHandler } from './hotmodulereloadsetup';
+
+if (import.meta.hot) {
+  import.meta.hot.accept(HMREventHandler)
+}
+
+export default class Renderer {
     private canvas: HTMLCanvasElement;
     private ctx: CanvasRenderingContext2D;
     public readonly BLOCK_SIZE = 20;
@@ -46,7 +52,7 @@ export class Renderer {
         document.addEventListener('keyup', (event: KeyboardEvent) => {
             InputRouter.registerKeyUp(event.key);
         });
-    }   
+    }
 
     // Get the mouse position in grid blocks on the canvas
     public getMouseGridPosition(mousePixelX: number, mousePixelY: number): { mouseGridX: number, mouseGridY: number } {
@@ -67,7 +73,7 @@ export class Renderer {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.drawGrid(world);
         this.drawMinions(world);
-        
+
         SignalBox.heldPiecePosition.value = { x: currentInput.mouseGridX, y: currentInput.mouseGridY };
         SignalBox.mousePixels.value = { x: currentInput.mouseX, y: currentInput.mouseY };
         if (currentInput.mouseGridX !== null && currentInput.mouseGridY !== null) {
@@ -90,7 +96,7 @@ export class Renderer {
             }
         }
     }
-    
+
       // Draw the outline of the held piece within the bounds of the grid
     private drawHeldPiece(world: World, xMouse: number, yMouse: number): void {
         // Set stroke color to red or green depending on if the piece can be placed
@@ -108,9 +114,9 @@ export class Renderer {
         for (const minion of world.minions) {
             // Draw a smaller rectangle inside the cell (with a small margin)
             this.ctx.fillRect(
-                minion.currentCell.x * this.BLOCK_SIZE + 2, 
-                minion.currentCell.y * this.BLOCK_SIZE + 3, 
-                this.BLOCK_SIZE - 8, 
+                minion.currentCell.x * this.BLOCK_SIZE + 2,
+                minion.currentCell.y * this.BLOCK_SIZE + 3,
+                this.BLOCK_SIZE - 8,
                 this.BLOCK_SIZE - 8
             );
         }

@@ -10,7 +10,13 @@
 // See InputRouter.handleInput() and
 // InputRouter.setupCanvasListeners() for more details.
 
-class FrameInput {
+import { HMREventHandler } from './hotmodulereloadsetup';
+
+if (import.meta.hot) {
+  import.meta.hot.accept(HMREventHandler)
+}
+
+export default class FrameInput {
     // mouse position in screen pixels relative to canvas
     public mouseX: number | null  = null;
     public mouseY: number | null = null;
@@ -38,5 +44,3 @@ class FrameInput {
       this.keysDone = new Set(other.keysDone);
     }
   }
-  
-  export { FrameInput };

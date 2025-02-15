@@ -1,10 +1,16 @@
 import { Cell } from "./cell";
-import { World } from "./world";
+import World from "./world";
 import { Flavours } from "./flavour";
+import { HMREventHandler } from './hotmodulereloadsetup';
+
+if (import.meta.hot) {
+  import.meta.hot.accept(HMREventHandler)
+}
+
 
 // Minion: a little white entity that moves 1 cell per second along a corridor path.
 // It picks a random corridor cell as its destination and uses a simple BFS to pathfind.
-export class Minion {
+export default class Minion {
     public currentCell: Cell;
     private destinationCell: Cell | null = null;
     private path: Cell[] = [];
@@ -86,4 +92,4 @@ export class Minion {
         }
         return [];
     }
-} 
+}

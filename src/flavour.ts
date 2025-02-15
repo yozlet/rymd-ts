@@ -1,6 +1,12 @@
 // Flavours are the different types of rooms.
+import { HMREventHandler } from './hotmodulereloadsetup';
 
-export type Flavour = {
+if (import.meta.hot) {
+  import.meta.hot.accept(HMREventHandler)
+}
+
+
+type Flavour = {
   name: string;
   colour: string;
 }
@@ -26,3 +32,5 @@ const FlavourOrder: Array<Flavour> = [
 ]
 
 export { Flavours, FlavourOrder };
+
+export default Flavour;

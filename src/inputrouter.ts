@@ -1,14 +1,14 @@
-import { World } from './world';
-import { Game } from './game';
-import { Flavour } from './flavour';
-import { FrameInput } from './frameinput';
+import World from './world';
+import Game from './game';
+import Flavour from './flavour';
+import FrameInput from './frameinput';
 
 class InputRouter {
     private static world: World;
     private static game: Game;
     public static currentInput = new FrameInput();
     private static nextInput = new FrameInput();
-    
+
     public static setWorld(world: World): void {
         InputRouter.world = world;
     }
@@ -77,10 +77,10 @@ class InputRouter {
             InputRouter.nextInput.click = false;
         }
     }
-        
+
     public static setFlavour(flavour: Flavour): void {
         InputRouter.world.setPieceFlavour(flavour);
     }
 }
 
-export { InputRouter as InputRouter };
+export default InputRouter;

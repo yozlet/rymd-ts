@@ -4,8 +4,15 @@
 // A Room has a single Flavour from a set of Flavours.
 
 import { Cell } from "./cell";
-import { Flavour } from "./flavour";
-class Room {
+import Flavour from "./flavour";
+
+import { HMREventHandler } from './hotmodulereloadsetup';
+
+if (import.meta.hot) {
+  import.meta.hot.accept(HMREventHandler)
+}
+
+export default class Room {
     public cells: Array<Cell> = [];
     public flavour: Flavour;
 
@@ -15,5 +22,3 @@ class Room {
     }
 
 }
-
-export { Room };
